@@ -36,6 +36,8 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
                 _context.Product.Add(product); // Prepares insert
                 await _context.SaveChangesAsync(); // Executes pending insert
 
+                ViewData["Message"] = $"{product.Name} was added successfully";
+
                 return View();
             }
             return View(product);
@@ -61,6 +63,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
                 _context.Update(product);
                 await _context.SaveChangesAsync();
 
+                TempData["Message"] = $"{product.Name} was updated successfully";
                 return RedirectToAction("Index");
             }
             return View(product);
@@ -87,8 +90,11 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
             {
                 _context.Product.Remove(productToDelete);
                 await _context.SaveChangesAsync();
+
+                TempData["Message"] = productToDelete.Name + " was deleted successfully";
                 return RedirectToAction("Index");
             }
+            TempData["Message"] = "This game was already deleted";
             return RedirectToAction("Index");
         }
     }
