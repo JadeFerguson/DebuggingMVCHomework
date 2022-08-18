@@ -61,35 +61,35 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
                 _context.Update(product);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             return View(product);
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            Product? productToDelete = await _context.Product.FindAsync();
 
-            if (product == null)
+            if (productToDelete == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(productToDelete);
         }
 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            _context.Product.Remove(product);
-            return RedirectToAction(nameof(Index));
-        }
+            Product productToDelete = await _context.Product.FindAsync(id);
 
-        private bool ProductExists(int id)
-        {
-            return _context.Product.Any(e => e.ProductId == id);
+            if (productToDelete != null)
+            {
+                _context.Product.Remove(productToDelete);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            return RedirectToAction("Index");
         }
     }
 }
