@@ -81,7 +81,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            Product productToDelete = await _context.Product.FindAsync(id);
+            Product? productToDelete = await _context.Product.FindAsync(id);
 
             if (productToDelete != null)
             {
