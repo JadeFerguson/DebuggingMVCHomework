@@ -43,12 +43,14 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            if (product == null)
+            Product? productToEdit = await _context.Product.FindAsync(id);
+
+            if (productToEdit == null)
             {
                 return NotFound();
             }
-            return View(product);
+
+            return View(productToEdit);
         }
 
         [HttpPost]
