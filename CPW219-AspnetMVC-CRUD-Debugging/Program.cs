@@ -3,13 +3,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
 string dbConnection = builder.Configuration.GetConnectionString("CoreWithBugsDB");
-builder.Services.AddDbContext<ProductContext>(
-        options => options.UseSqlServer(dbConnection)
-    );
+builder.Services.AddDbContext<ProductContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 

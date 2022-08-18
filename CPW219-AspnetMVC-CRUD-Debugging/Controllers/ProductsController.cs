@@ -15,9 +15,14 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Product.ToListAsync());
+            // refactored this
+            List<Product> products = await (from product in _context.Product
+                                            select product).ToListAsync();
+
+            return View(products);
         }
 
+        [HttpGet] // added in
         public IActionResult Create()
         {
             return View();
@@ -28,20 +33,26 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _context.AddAsync(product);
-                return RedirectToAction(nameof(Index));
+                _context.Product.Add(product); // Prepares insert
+                await _context.SaveChangesAsync(); // Executes pending insert
+
+                ViewData["Message"] = $"{product.Name} was added successfully";
+
+                return View();
             }
             return View(product);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            if (product == null)
+            Product? productToEdit = await _context.Product.FindAsync(id);
+
+            if (productToEdit == null)
             {
                 return NotFound();
             }
-            return View(product);
+
+            return View(productToEdit);
         }
 
         [HttpPost]
@@ -52,35 +63,39 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
                 _context.Update(product);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
+                TempData["Message"] = $"{product.Name} was updated successfully";
+                return RedirectToAction("Index");
             }
             return View(product);
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            Product? productToDelete = await _context.Product.FindAsync(id);
 
-            if (product == null)
+            if (productToDelete == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(productToDelete);
         }
 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            _context.Product.Remove(product);
-            return RedirectToAction(nameof(Index));
-        }
+            Product? productToDelete = await _context.Product.FindAsync(id);
 
-        private bool ProductExists(int id)
-        {
-            return _context.Product.Any(e => e.ProductId == id);
+            if (productToDelete != null)
+            {
+                _context.Product.Remove(productToDelete);
+                await _context.SaveChangesAsync();
+
+                TempData["Message"] = productToDelete.Name + " was deleted successfully";
+                return RedirectToAction("Index");
+            }
+            TempData["Message"] = "This game was already deleted";
+            return RedirectToAction("Index");
         }
     }
 }
