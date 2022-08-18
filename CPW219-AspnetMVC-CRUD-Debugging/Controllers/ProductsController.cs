@@ -33,8 +33,10 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _context.AddAsync(product);
-                return RedirectToAction(nameof(Index));
+                _context.Product.Add(product); // Prepares insert
+                await _context.SaveChangesAsync(); // Executes pending insert
+
+                return View();
             }
             return View(product);
         }
