@@ -97,5 +97,18 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
             TempData["Message"] = "This game was already deleted";
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            Product? productDetails = await _context.Product.FindAsync(id);
+
+            if (productDetails == null)
+            {
+                return NotFound();
+            }
+
+            return View(productDetails);
+
+        }
     }
 }
